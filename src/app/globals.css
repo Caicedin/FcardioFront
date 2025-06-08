@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  @apply min-h-screen antialiased bg-gradient-to-br from-orange-500 to-yellow-300 text-gray-800;
+}
+
+::selection {
+  @apply bg-orange-500 text-white;
+}
+
+input, button, textarea {
+  font-family: inherit;
+}
+.swal-confirm-custom {
+  background-color: black !important;
+  color: white !important;
+  border: none !important;
+  padding: 8px 24px !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+}
+
