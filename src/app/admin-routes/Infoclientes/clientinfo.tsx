@@ -1,10 +1,8 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-
-// Tipos
 
 type Role = {
   id: string;
@@ -35,7 +33,7 @@ type UserProfile = User & {
   zonaEntrenamiento?: Record<string, any>;
 };
 
-export default function InfoClientesClient() {
+export default function ClientInfo() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const userId = searchParams.get('id');
