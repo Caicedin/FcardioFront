@@ -9,8 +9,6 @@ import Swal from 'sweetalert2';
 export default function RegistroInicialPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState('');
-  const [profileId, setProfileId] = useState('');
   const [notificado, setNotificado] = useState(false);
   const [missing, setMissing] = useState({
     medical: true,
@@ -27,18 +25,17 @@ export default function RegistroInicialPage() {
         const headers = { Authorization: `Bearer ${token}` };
 
         const userRes = await axios.get('http://localhost:3001/fcardio/api/v1/auth/profile', { headers });
-        const fetchedUserId = userRes.data.userId;
-        setUserId(fetchedUserId);
+        const userId = userRes.data.userId;
 
         // Verificar perfil médico
         let profileRes = await axios.get('http://localhost:3001/fcardio/api/v1/medical-profiles', { headers });
-        let profile = profileRes.data.find((p: any) => p.userId === fetchedUserId);
+        let profile = profileRes.data.find((p: any) => p.userId === userId);
 
         if (!profile) {
           try {
             const createRes = await axios.post(
               'http://localhost:3001/fcardio/api/v1/medical-profiles',
-              { userId: fetchedUserId, fechaEvaluacion: new Date().toISOString() },
+              { userId, fechaEvaluacion: new Date().toISOString() },
               { headers }
             );
             profile = createRes.data.data;
@@ -47,7 +44,7 @@ export default function RegistroInicialPage() {
             if (err.response?.status === 409) {
               console.warn('Perfil médico ya existía. Intentando obtener de nuevo...');
               profileRes = await axios.get('http://localhost:3001/fcardio/api/v1/medical-profiles', { headers });
-              profile = profileRes.data.find((p: any) => p.userId === fetchedUserId);
+              profile = profileRes.data.find((p: any) => p.userId === userId);
               if (!profile) throw new Error('Perfil médico no encontrado tras conflicto 409');
             } else {
               throw err;
@@ -55,23 +52,23 @@ export default function RegistroInicialPage() {
           }
         }
 
-        setProfileId(profile.id);
+        const profileId = profile.id;
         setMissing((prev) => ({ ...prev, medical: false }));
 
         const historiaRes = await axios.get('http://localhost:3001/fcardio/api/v1/historias-clinicas', { headers });
-        const historia = historiaRes.data.find((h: any) => h.profileId === profile.id);
+        const historia = historiaRes.data.find((h: any) => h.profileId === profileId);
         if (historia) setMissing((prev) => ({ ...prev, historia: false }));
 
         const parqRes = await axios.get('http://localhost:3001/fcardio/api/v1/parq', { headers });
-        const parq = parqRes.data.find((p: any) => p.profileId === profile.id);
+        const parq = parqRes.data.find((p: any) => p.profileId === profileId);
         if (parq) setMissing((prev) => ({ ...prev, parq: false }));
 
         const evalRes = await axios.get('http://localhost:3001/fcardio/api/v1/evaluaciones-morfofuncionales', { headers });
-        const evaluacion = evalRes.data.find((e: any) => e.profileId === profile.id);
+        const evaluacion = evalRes.data.find((e: any) => e.profileId === profileId);
         if (evaluacion) setMissing((prev) => ({ ...prev, morfo: false }));
 
         const fcRes = await axios.get('http://localhost:3001/fcardio/api/v1/funciones-cardiacas', { headers });
-        const fc = fcRes.data.find((f: any) => f.profileId === profile.id);
+        const fc = fcRes.data.find((f: any) => f.profileId === profileId);
         if (fc) setMissing((prev) => ({ ...prev, funcionesCardiacas: false }));
       } catch (err) {
         console.error('Error cargando estado de formularios:', err);

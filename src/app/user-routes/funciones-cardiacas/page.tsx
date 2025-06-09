@@ -6,32 +6,6 @@ import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import CreatableSelect from 'react-select/creatable';
 
-// Opciones para VAM (Velocidad Aeróbica Máxima) - No usado, mantenemos el input de texto
-// const vamOptions = [
-//   {
-//     label: 'Nivel general',
-//     options: [
-//       { value: 'VAM <10 km/h', label: 'Bajo (<10 km/h)' },
-//       { value: 'VAM 10-12 km/h', label: 'Moderado bajo (10-12 km/h)' },
-//       { value: 'VAM 12-14 km/h', label: 'Moderado (12-14 km/h)' },
-//       { value: 'VAM 14-16 km/h', label: 'Moderado alto (14-16 km/h)' },
-//       { value: 'VAM 16-18 km/h', label: 'Alto (16-18 km/h)' },
-//       { value: 'VAM >18 km/h', label: 'Muy alto (>18 km/h)' },
-//     ]
-//   },
-//   {
-//     label: 'Nivel deportivo',
-//     options: [
-//       { value: 'VAM <14 km/h', label: 'Principiante (<14 km/h)' },
-//       { value: 'VAM 14-16 km/h', label: 'Recreativo (14-16 km/h)' },
-//       { value: 'VAM 16-18 km/h', label: 'Competitivo (16-18 km/h)' },
-//       { value: 'VAM 18-20 km/h', label: 'Élite amateur (18-20 km/h)' },
-//       { value: 'VAM >20 km/h', label: 'Élite profesional (>20 km/h)' },
-//     ]
-//   }
-// ];
-
-// Opciones para VO2 Max - Categorizado por género y edad
 const vo2MaxOptions = [
   {
     label: 'Mujeres menores de 40 años',
@@ -124,7 +98,7 @@ export default function FuncionCardiacaPage() {
           
           // Si hay un valor VO2 Max, buscar la opción correspondiente
           if (fcData.vo2max) {
-            let vo2Value = parseFloat(fcData.vo2max);
+            const vo2Value = parseFloat(fcData.vo2max);
             let vo2Option = null;
             
             // Función auxiliar para encontrar la categoría adecuada
@@ -133,7 +107,8 @@ export default function FuncionCardiacaPage() {
               const allOptions = vo2MaxOptions.flatMap(group => group.options);
               
               // Buscar primero por rangos específicos
-              for (let option of allOptions) {
+             for (const option of allOptions) {
+
                 if (option.value.includes('<') && value < parseInt(option.value.match(/\d+/g)?.[0] || '0')) {
                   return option;
                 } else if (option.value.includes('>') && value > parseInt(option.value.match(/\d+/g)?.[0] || '0')) {

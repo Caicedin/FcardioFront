@@ -4,17 +4,15 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
-import Swal from 'sweetalert2';
 
 export default function ParqFormPage() {
   const router = useRouter();
   const [profileId, setProfileId] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');  const [requiereValoracion, setRequiereValoracion] = useState(false);
+  const [error, setError] = useState('');  const [success, setSuccess] = useState('');
+  const [requiereValoracion, setRequiereValoracion] = useState(false);
   const [respuestas, setRespuestas] = useState<Record<string, boolean>>({});
   const [tieneSiRespuestas, setTieneSiRespuestas] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -31,14 +29,8 @@ export default function ParqFormPage() {
         const profileRes = await axios.get('http://localhost:3001/fcardio/api/v1/medical-profiles', {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         const perfil = profileRes.data.find((p: any) => p.userId === userId);
         if (!perfil) {
-          setDebugInfo({
-            message: 'No se encontró perfil médico para este usuario',
-            userId,
-            perfilesDisponibles: profileRes.data.map((p: any) => ({ id: p.id, userId: p.userId })),
-          });
           throw new Error('Perfil médico no encontrado');
         }
 
@@ -52,15 +44,16 @@ export default function ParqFormPage() {
 
     fetchProfile();
   }, []);
-
   const preguntas = [
-    '¿Alguna vez le ha dicho un médico que tiene un problema cardíaco y que solo debe realizar actividad física recomendada por un médico?',
-    '¿Siente dolor en el pecho cuando realiza actividad física?',
-    '¿Ha tenido dolor en el pecho en el último mes?',
-    '¿Sufre de problemas óseos o articulares que se agravan con la actividad física?',
-    '¿Toma medicamentos para la presión arterial o el corazón?',
-    '¿Conoce alguna otra razón por la cual no debería hacer actividad física?',
-  ];  const handleSubmit = async (e: React.FormEvent) => {
+    `¿Alguna vez le ha dicho un médico que tiene un problema cardíaco y que solo debe realizar actividad física recomendada por un médico?`,
+    `¿Siente dolor en el pecho cuando realiza actividad física?`,
+    `¿Ha tenido dolor en el pecho en el último mes?`,
+    `¿Sufre de problemas óseos o articulares que se agravan con la actividad física?`,
+    `¿Toma medicamentos para la presión arterial o el corazón?`,
+    `¿Conoce alguna otra razón por la cual no debería hacer actividad física?`,
+  ];
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -76,27 +69,17 @@ export default function ParqFormPage() {
       if (!profileId) throw new Error('No se ha podido determinar el ID del perfil médico');
 
       const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };      await axios.post(
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.post(
         'http://localhost:3001/fcardio/api/v1/parq',
         { profileId, requiereValoracion, respuestas },
         { headers }
       );
 
       setSuccess('PAR-Q enviado correctamente');
-
-      // Verificar qué sigue
-      const evalRes = await axios.get('http://localhost:3001/fcardio/api/v1/evaluaciones-morfofuncionales', { headers });
-      const evaluacion = evalRes.data.find((e: any) => e.profileId === profileId);
-
-      router.push('/user-routes/dashboard');
-
-    } catch (err: any) {
+      router.push('/user-routes/dashboard');} catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || 'Error al guardar el PAR-Q';
       setError(`Error: ${errorMessage}`);
-      setDebugInfo({
-        errorDetail: err.response?.data || err.message,
-        requestData: { profileId, requiereValoracion, respuestas },
-      });
     }
   };
 
@@ -125,7 +108,8 @@ export default function ParqFormPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {preguntas.map((pregunta, index) => (
             <div key={index}>
-              <p className="text-gray-800 font-medium mb-2">{pregunta}</p>              <div className="flex gap-6">
+              <p className="text-gray-800 font-medium mb-2">{pregunta}</p>
+              <div className="flex gap-6">
                 <label className="inline-flex items-center">
                   <input
                     type="radio"
@@ -168,14 +152,17 @@ export default function ParqFormPage() {
               onChange={(e) => setRequiereValoracion(e.target.checked)}
             />
             <span className="ml-2">Requiere valoración médica adicional</span>
-          </label>          {error && (
+          </label>
+          {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
               <p>{error}</p>
             </div>
           )}{success && (
             <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
               {success}
-            </div>          )}          {tieneSiRespuestas && (
+            </div>
+          )}
+          {tieneSiRespuestas && (
             <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
               <p className="font-bold">¡Importante!</p>
               <p className="mb-3">Ha respondido "Sí" a al menos una pregunta. Se recomienda consultar con un médico antes de iniciar un programa de actividad física.</p>

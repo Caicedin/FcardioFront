@@ -28,13 +28,12 @@ export default function ZonasEntrenamientoPage() {
         const profile = profilesRes.data.find((p: any) => p.userId === userId);
         if (!profile) throw new Error('Perfil médico no encontrado');
 
-        const profileId = profile.id;
-
-        // 3. Obtener zonas
-        let zonasRes = await axios.get('http://localhost:3001/fcardio/api/v1/zonas-entrenamiento', { headers });
-        let zonas = zonasRes.data.filter((z: any) => z.profileId === profileId);
+        const profileId = profile.id;        // 3. Obtener zonas
+        const zonasRes = await axios.get('http://localhost:3001/fcardio/api/v1/zonas-entrenamiento', { headers });
+        const zonasIniciales = zonasRes.data.filter((z: any) => z.profileId === profileId);
 
         // 4. Si no hay zonas, crear una automáticamente
+        let zonas = zonasIniciales;
         if (!zonas.length) {
           const createRes = await axios.post(
             'http://localhost:3001/fcardio/api/v1/zonas-entrenamiento',
