@@ -1,6 +1,6 @@
 'use client';
 
-import html2pdf from 'html2pdf.js';
+import { useEffect, useState } from 'react';
 
 export function DescargarAnalisisIA({
   datos,
@@ -11,7 +11,20 @@ export function DescargarAnalisisIA({
     observacionesGenerales: string[];
   };
 }) {
-  const handleDownload = () => {
+  // Estado para controlar si estamos en el cliente
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Efecto para asegurarse de que este componente solo se ejecuta en el cliente
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const handleDownload = async () => {
+    if (typeof window === 'undefined') return;
+
+    // Importamos html2pdf dinámicamente solo en el cliente
+    const html2pdf = (await import('html2pdf.js')).default;
+
     const element = document.createElement('div');
 
     element.innerHTML = `
@@ -41,7 +54,6 @@ export function DescargarAnalisisIA({
   </div>
 `;
 
-
     html2pdf()
       .from(element)
       .set({
@@ -52,6 +64,11 @@ export function DescargarAnalisisIA({
       })
       .save();
   };
+
+  // No renderizamos nada si no estamos en el cliente
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <button

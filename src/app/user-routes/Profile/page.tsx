@@ -4,7 +4,13 @@ import { useEffect, useState } from 'react'
 import { Loader2, ArrowLeft, UserCircle, Activity, HeartPulse, FileText, ShieldCheck } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
-import { DescargarAnalisisIA } from '@/components/Pdf/DescargarAnalisisIA'
+import dynamic from 'next/dynamic'
+
+// Importar DescargarAnalisisIA de forma dinámica para evitar errores de SSR
+const DescargarAnalisisIA = dynamic(
+  () => import('@/components/Pdf/DescargarAnalisisIA').then(mod => mod.DescargarAnalisisIA),
+  { ssr: false } // Importante: Esto evita que el componente se ejecute en el servidor
+)
 
 export default function ProfilePage() {
   const router = useRouter()
